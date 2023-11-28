@@ -1,12 +1,15 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CellularAutomatonSecondAttempt
 {
-
-    public enum State { Grass, Foundation, House, FirstFloor, SecondFloor, Roof, Sky, Blocked }
-
-    public class Cube3D : IFigure3D
+    internal class TriangularPrism : IFigure3D
     {
+
         public List<List<Vector3>> Polygons { get; set; } // полигоны куба (квадрат)
         public Vector3 BaseVector { get; set; }           // базовый вектор - относительно него задаются остальные вершины куба. Вершина 0
 
@@ -23,19 +26,19 @@ namespace CellularAutomatonSecondAttempt
 
         public List<List<Vector3>> BufferPolygons { get; set; }  // буфер полигонов
         public static int LengthEdge = 40; // длина ребра
-        
+
 
         public State ActiveState { get; set; } // текущее состояние куба
 
 
-        public Cube3D() 
+        public TriangularPrism()
         {
             BaseVector = new(0, 0, 0);
             ActiveState = State.Grass;
             SetPolygonsDefault();
         }
 
-        public Cube3D(Vector3 baseVector, State state = State.Grass, int lengthEdge = 50)
+        public TriangularPrism(Vector3 baseVector, State state = State.Grass, int lengthEdge = 50)
         {
             BaseVector = baseVector;
             SetPolygonsDefault();
@@ -47,56 +50,33 @@ namespace CellularAutomatonSecondAttempt
         {
             Polygons = new()
             {
-                /*new()
+
+                // левый
+                new()
                 {
                     BaseVector,
-                    BaseVector + new Vector3(LengthEdge, 0, 0),
+                    BaseVector + new Vector3(LengthEdge / 2, 0, LengthEdge / 2),
+                    BaseVector + new Vector3(LengthEdge / 2, LengthEdge,  LengthEdge/ 2),
+                    BaseVector + new Vector3(0, LengthEdge, 0),
+                },
+
+                // правый
+                new()
+                {
+                    BaseVector + new Vector3(LengthEdge / 2, 0, LengthEdge / 2),
+                    BaseVector + new Vector3(LengthEdge / 2, LengthEdge,  LengthEdge/ 2),
                     BaseVector + new Vector3(LengthEdge, LengthEdge, 0),
+                    BaseVector + new Vector3(LengthEdge, 0, 0),
+                },
+
+                // передний
+                new()
+                {
                     BaseVector + new Vector3(0, LengthEdge, 0),
+                    BaseVector + new Vector3(LengthEdge / 2, LengthEdge,  LengthEdge/ 2),
+                    BaseVector + new Vector3(LengthEdge, LengthEdge, 0),
                 },
 
-                new()
-                {
-                    BaseVector,
-                    BaseVector + new Vector3(0, LengthEdge, 0),
-                    BaseVector + new Vector3(0, LengthEdge, LengthEdge),
-                    BaseVector + new Vector3(0, 0, LengthEdge),
-                },
-
-                new()
-                {
-                    BaseVector,
-                    BaseVector + new Vector3(0, 0, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, 0, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, 0, 0)
-                },*/
-
-                // верхний (0154 - см выше)
-                new()
-                {
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(LengthEdge, 0, 0),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(LengthEdge, LengthEdge, 0),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(0, LengthEdge, 0),
-                },
-
-                // правый (1562 - см выше)
-                new()
-                {
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(0, LengthEdge, 0),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(0, LengthEdge, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(0, 0, LengthEdge),
-                },
-
-                // левый (4576 - см выше)
-                new()
-                {
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(0, 0, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(LengthEdge, 0, LengthEdge),
-                    BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(LengthEdge, 0, 0)
-                }
             };
             RotateX(50);
             RotateY(-40);
@@ -117,9 +97,10 @@ namespace CellularAutomatonSecondAttempt
         // отрисовка куба
         public void DrawFigure(Graphics graphics, Pen penContour, Pen penFill)
         {
-            PointF[] Polygon2DArray = new PointF[Polygons[0].Count];
+            
             foreach (var polygon in Polygons)
             {
+                PointF[] Polygon2DArray = new PointF[polygon.Count];
                 for (int i = 0; i < polygon.Count; i++)
                 {
                     Polygon2DArray[i].X = polygon[i].X;
@@ -191,7 +172,5 @@ namespace CellularAutomatonSecondAttempt
             vector.Z = (int)(vector.X * (-sin) + vector.Z * cos);
             return new Vector3(vector.X, vector.Y, vector.Z);
         }
-
-
     }
 }

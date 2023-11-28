@@ -17,7 +17,7 @@ namespace CellularAutomatonSecondAttempt
         public int StartFildRectanglesX;
         public int StartFildRectanglesY;
 
-        public List<List<List<Cube3D>>> Cubs;
+        public List<List<List<IFigure3D>>> Cubs;
         public int Count = 10;
 
 
@@ -53,7 +53,7 @@ namespace CellularAutomatonSecondAttempt
                 for (int j = 0; j < Count; j++)
                 {
                     Cubs[i].Add(new());
-                    Cubs[i][j].Add(new (new Vector3(baseVector.X + i * Cube3D.LengthEdge, baseVector.Y + j * Cube3D.LengthEdge, 0)));
+                    Cubs[i][j].Add(new Cube3D(new Vector3(baseVector.X + i * Cube3D.LengthEdge, baseVector.Y + j * Cube3D.LengthEdge, 0)));
                 }
             }
         }
@@ -70,31 +70,57 @@ namespace CellularAutomatonSecondAttempt
                         switch(Cubs[i][j][k].ActiveState)
                         {
                             case State.Grass:
-                                Cubs[i][j][k].DrawCube(graphics, penContour, new Pen(Color.Green));
+                                Cubs[i][j][k].DrawFigure(graphics, penContour, new Pen(Color.GreenYellow));
                                 break;
                             case State.Foundation:
-                                Cubs[i][j][k].DrawCube(graphics, penContour, new Pen(Color.Gray));
+                                Cubs[i][j][k].DrawFigure(graphics, penContour, new Pen(Color.Gray));
                                 break;
-                            case State.House:
-                                Cubs[i][j][k].DrawCube(graphics, penContour, new Pen(Color.Brown));
+                            case State.FirstFloor:
+                                Cubs[i][j][k].DrawFigure(graphics, penContour, new Pen(Color.FromArgb(210, 176, 76)));
                                 break;
+                            case State.SecondFloor:
+                                Cubs[i][j][k].DrawFigure(graphics, penContour, new Pen(Color.FromArgb(51, 51, 51)));
+                                break;
+                            case State.Roof:
+                                Cubs[i][j][k].DrawFigure(graphics, penContour, new Pen(Color.FromArgb(200, 80, 0)));
+                                break;
+                            /*case State.Sky:
+                                var brushSky = new SolidBrush(Color.FromArgb(128, 153, 255, 251));
+                                Cubs[i][j][k].DrawCube(graphics, penContour, new Pen(Color.FromArgb(128, 153, 255, 251)));
+                                break;*/
                         }
                     }
                     var cube = Cubs[i][j].LastOrDefault();
                     switch (cube.ActiveState)
                     {
                         case State.Grass:
-                            graphics.FillRectangle(Brushes.Green, Rectangles[(i, j)]);
+                            graphics.FillRectangle(Brushes.GreenYellow, Rectangles[(i, j)]);
                             graphics.DrawRectangle(penContour, Rectangles[(i, j)]);
                             break;
                         case State.Foundation:
                             graphics.FillRectangle(Brushes.Gray, Rectangles[(i, j)]);
                             graphics.DrawRectangle(penContour, Rectangles[(i, j)]);
                             break;
-                        case State.House:
-                            graphics.FillRectangle(Brushes.Brown, Rectangles[(i, j)]);
+                        case State.FirstFloor:
+                            var brushFirstFloor = new SolidBrush(Color.FromArgb(210, 176, 76));
+                            graphics.FillRectangle(brushFirstFloor, Rectangles[(i, j)]);
                             graphics.DrawRectangle(penContour, Rectangles[(i, j)]);
                             break;
+                        case State.SecondFloor:
+                            var brushSecondFloor = new SolidBrush(Color.FromArgb(51, 51, 51));
+                            graphics.FillRectangle(brushSecondFloor, Rectangles[(i, j)]);
+                            graphics.DrawRectangle(penContour, Rectangles[(i, j)]);
+                            break;
+                        case State.Roof:
+                            var brushRoof = new SolidBrush(Color.FromArgb(200, 80, 0));
+                            graphics.FillRectangle(brushRoof, Rectangles[(i, j)]);
+                            graphics.DrawRectangle(penContour, Rectangles[(i, j)]);
+                            break;
+                        /*case State.Sky:
+                            var brushSky = new SolidBrush(Color.FromArgb(153, 255, 251));
+                            graphics.FillRectangle(brushSky, Rectangles[(i, j)]);
+                            graphics.DrawRectangle(penContour, Rectangles[(i, j)]);
+                            break;*/
                     }
                     
                 }
@@ -116,16 +142,44 @@ namespace CellularAutomatonSecondAttempt
                 {
                     case State.Grass:
                         Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.Foundation));
+                        Draw(graphics, penContour);
                         break;
                     case State.Foundation:
-                        Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.House));
+                        Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.FirstFloor));
+                        Draw(graphics, penContour);
                         break;
-                    case State.House:
-                        Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.House));
+                    case State.FirstFloor:
+                        Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.SecondFloor));
+                        Draw(graphics, penContour);
                         break;
+                    case State.SecondFloor:
+                        Cubs[key.Item1][key.Item2].Add(new TriangularPrism(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.Roof));
+                        Draw(graphics, penContour);
+                        break;
+                    /*case State.Roof:
+                        Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.Sky));
+                        break;
+                    case State.Sky:
+                        Cubs[key.Item1][key.Item2].Add(new Cube3D(new Vector3(cube.BaseVector.X, cube.BaseVector.Y, cube.BaseVector.Z + Cube3D.LengthEdge), State.Sky));
+                        break;*/
                 }
-                Draw(graphics, penContour);
 
+            }
+        }
+
+        public void Remove(Graphics graphics, Pen penContour, int x, int y)
+        {
+            x -= x % Cube3D.LengthEdge;
+            y -= y % Cube3D.LengthEdge;
+            var rectangle = new Rectangle(x, y, Cube3D.LengthEdge, Cube3D.LengthEdge);
+            if (Rectangles.ContainsValue(rectangle))
+            {
+                var key = Rectangles.FirstOrDefault(e => e.Value == rectangle).Key;
+                if (Cubs[key.Item1][key.Item2].Count != 1)
+                {
+                    Cubs[key.Item1][key.Item2].Remove(Cubs[key.Item1][key.Item2][Cubs[key.Item1][key.Item2].Count - 1]);
+                    Draw(graphics, penContour);
+                }
             }
         }
 
