@@ -10,12 +10,12 @@ namespace CellularAutomatonSecondAttempt
 
             Graphics = pBox.CreateGraphics();
             PenContour = new Pen(Color.Black);
-
+            BaseVector = new Vector3(pBox.ClientSize.Width - Cube3D.LengthEdge * 2, pBox.ClientSize.Height - Cube3D.LengthEdge * 12, 0);
             GameField = new(new Vector3(pBox.ClientSize.Width - Cube3D.LengthEdge * 2, pBox.ClientSize.Height - Cube3D.LengthEdge * 12, 0));
             
         }
 
-
+        public Vector3 BaseVector; 
         public Graphics Graphics;
         public Pen PenContour;
 
@@ -41,7 +41,7 @@ namespace CellularAutomatonSecondAttempt
 
         private void buttonClear_Click(object sender, EventArgs e)
         {
-            GameField = new(new Vector3(pBox.ClientSize.Width - Cube3D.LengthEdge * 2, pBox.ClientSize.Height, 0));
+            GameField = new(BaseVector);
             Graphics.Clear(Color.White);
             GameField.Draw(Graphics, PenContour);
         }
