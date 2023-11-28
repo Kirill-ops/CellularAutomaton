@@ -12,32 +12,43 @@ namespace CellularAutomatonSecondAttempt
     public enum State { Grass, Foundation, House }
     public class Cube3D
     {
-        public List<List<Vector3>> Polygons { get; set; }
-        public Vector3 BaseVector { get; set; }
-        public static int LengthEdge = 40;
-        public List<List<Vector3>> BufferPolygons { get; set; }
+        public List<List<Vector3>> Polygons { get; set; } // полигоны куба (квадрат)
+        public Vector3 BaseVector { get; set; }           // базовый вектор - относительно него задаются остальные вершины куба. Вершина 0
 
-        public State ActiveState { get; set; }
+        //        0---------------1
+        //       /|              /|
+        //      / |             / |
+        //     /  |            /  |
+        //    4---------------5   |
+        //    |   |           |   |
+        //    |   3-----------|---2
+        //    |  /            |  /
+        //    |/              | /
+        //    7---------------6
+
+        public List<List<Vector3>> BufferPolygons { get; set; }  // буфер полигонов
+        public static int LengthEdge = 40; // длина ребра
+        
+
+        public State ActiveState { get; set; } // текущее состояние куба
 
 
         public Cube3D() 
         {
             BaseVector = new(0, 0, 0);
             ActiveState = State.Grass;
-            SetPolygons();
+            SetPolygonsDefault();
         }
 
         public Cube3D(Vector3 baseVector, State state = State.Grass, int lengthEdge = 50)
         {
             BaseVector = baseVector;
-            SetPolygons();
+            SetPolygonsDefault();
             ActiveState = state;
         }
 
-
-
-
-        public void SetPolygons()
+        // задать Polygons
+        public void SetPolygonsDefault()
         {
             Polygons = new()
             {
@@ -90,8 +101,11 @@ namespace CellularAutomatonSecondAttempt
                     BaseVector + new Vector3(LengthEdge, LengthEdge, LengthEdge) - new Vector3(LengthEdge, 0, 0)
                 }
             };
+            RotateX(50);
+            RotateY(-40);
         }
 
+        // задать BufferPolygons
         private void SetBufferPolygons()
         {
             BufferPolygons = new();
@@ -101,18 +115,11 @@ namespace CellularAutomatonSecondAttempt
                 for (int j = 0; j < Polygons[i].Count; j++)
                     BufferPolygons[i].Add(new Vector3(Polygons[i][j].X, Polygons[i][j].Y, Polygons[i][j].Z));
             }
-
         }
 
-        private bool _flag = true;
+        // отрисовка куба
         public void DrawCube(Graphics graphics, Pen penContour, Pen penFill)
         {
-            if (_flag)
-            {
-                RotateX(50);
-                RotateY(-40);
-                _flag = false;
-            }
             PointF[] Polygon2DArray = new PointF[Polygons[0].Count];
             foreach (var polygon in Polygons)
             {
@@ -129,6 +136,7 @@ namespace CellularAutomatonSecondAttempt
         private bool _flagX = true;
         private bool _flagY = true;
 
+        // поворот Polygons по оси X на угол angel
         public void RotateX(double angel)
         {
             if (_flagY)
@@ -147,7 +155,7 @@ namespace CellularAutomatonSecondAttempt
         }
 
 
-
+        // поворот Polygons по оси Y на угол angel
         public void RotateY(double angel)
         {
             if (_flagX)
@@ -165,6 +173,7 @@ namespace CellularAutomatonSecondAttempt
             }
         }
 
+        // поврот вектора vector по оси X на угол Angel
         private Vector3 RotateX(Vector3 vector, double Angel)
         {
             double radians = Angel * Math.PI / 180.0;
@@ -175,7 +184,7 @@ namespace CellularAutomatonSecondAttempt
             return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
-
+        // поврот вектора vector по оси Y на угол Angel
         private Vector3 RotateY(Vector3 vector, double Angel)
         {
             double radians = Angel * Math.PI / 180.0;

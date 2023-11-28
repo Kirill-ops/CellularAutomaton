@@ -10,9 +10,9 @@ namespace CellularAutomatonSecondAttempt
             cube = new Cube3D(new Vector3(pBox.ClientSize.Width / 2, pBox.ClientSize.Height / 2, 0));
             graphics = pBox.CreateGraphics();
             penC = new Pen(Color.Black);
-            penF = new Pen(Color.Green);
 
             GameField = new(new Vector3(pBox.ClientSize.Width - Cube3D.LengthEdge * 2, pBox.ClientSize.Height, 0));
+            
         }
 
 
@@ -20,7 +20,6 @@ namespace CellularAutomatonSecondAttempt
         public Cube3D cube;
         public Graphics graphics;
         public Pen penC;
-        public Pen penF;
 
         public GameField GameField;
 
